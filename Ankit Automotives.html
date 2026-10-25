@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKGE | Ankit Automotives</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        b2b: {
+                            accent: '#0ea5e9', // Industrial Blue
+                            hover: '#0284c7'
+                        },
+                        b2c: {
+                            accent: '#f59e0b', // Amazon Orange
+                            hover: '#d97706',
+                            dark: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .product-card-hover:hover img {
+            transform: scale(1.05);
+        }
+        /* Cart Sidebar Animation Classes */
+        .cart-open {
+            transform: translateX(0);
+        }
+        .cart-closed {
+            transform: translateX(100%);
+        }
+        .overlay-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .overlay-closed {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Hide scrollbar for neatness */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+
+    <!-- ENTRY GATE (Role Selector) -->
+    <div id="role-gate" class="fixed inset-0 z-[100] bg-gray-900/95 backdrop-blur-md overflow-y-auto transition-opacity duration-500">
+        <div class="min-h-screen flex flex-col items-center justify-center p-4 py-10 w-full">
+            <div class="text-center mb-10 mt-auto">
+                <div class="w-20 h-20 bg-white rounded-xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-white/10">
+                    <span class="text-gray-900 font-black text-3xl tracking-tighter">AKGE</span>
+                </div>
+                <h1 class="text-3xl md:text-5xl font-black text-white mb-4">Welcome to AKGE Store</h1>
+                <p class="text-gray-400 text-lg">Please select your shopping experience to continue.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-4xl mb-auto">
+                <!-- B2B Option -->
+                <button onclick="window.selectRole('b2b')" class="flex-1 bg-white/10 border border-white/20 hover:border-b2b-accent hover:bg-white/20 p-8 rounded-2xl transition-all duration-300 group text-left relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-b2b-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fa-solid fa-industry text-5xl text-b2b-accent mb-6"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">Wholesale & B2B</h2>
+                    <p class="text-gray-400 text-sm">Bulk orders, global exports, custom manufacturing, and OEM catalog.</p>
+                </button>
+
+                <!-- B2C Option -->
+                <button onclick="window.selectRole('b2c')" class="flex-1 bg-white/10 border border-white/20 hover:border-b2c-accent hover:bg-white/20 p-8 rounded-2xl transition-all duration-300 group text-left relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-b2c-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <i class="fa-solid fa-cart-shopping text-5xl text-b2c-accent mb-6"></i>
+                    <h2 class="text-2xl font-bold text-white mb-2">Retail Customer</h2>
+                    <p class="text-gray-400 text-sm">Shop single items, add to cart, and get direct-to-door delivery.</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- B2C VIEW (RETAIL / AMAZON STYLE)           -->
+    <!-- ========================================== -->
+    <div id="view-b2c" style="display: none;" class="min-h-screen flex flex-col selection:bg-b2c-accent selection:text-white">
+        
+        <!-- B2C Header -->
+        <header class="fixed w-full top-0 z-40 glass-panel shadow-sm border-b border-gray-200">
+            <!-- Top Strip -->
+            <div class="bg-b2c-dark text-white text-xs py-1.5 px-2 sm:px-4 text-center font-bold tracking-wide flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 relative">
+                <button onclick="window.showGate()" class="sm:absolute left-4 top-1/2 sm:-translate-y-1/2 flex items-center gap-1 text-gray-300 hover:text-white transition-colors mb-1 sm:mb-0">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Change Role</span>
+                </button>
+                <span>FREE SHIPPING ON ORDERS OVER ₹999</span>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 shrink-0">
+                    <div class="px-3 h-12 bg-gradient-to-br from-b2c-dark to-slate-800 rounded flex items-center justify-center shadow-md">
+                        <span class="text-white font-black text-2xl tracking-tighter">AKGE</span>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-xl font-extrabold text-gray-900 leading-tight tracking-wide">AKGE <span class="font-light text-gray-500 text-sm">Retail</span></h1>
+                        <p class="text-[10px] text-b2c-accent font-bold uppercase tracking-widest">Premium Auto Parts</p>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-2xl hidden sm:flex items-center bg-gray-100 rounded-md overflow-hidden border border-transparent focus-within:border-b2c-accent focus-within:ring-1 focus-within:ring-b2c-accent transition-all">
+                    <select class="bg-gray-200 text-gray-700 text-sm px-3 py-2 border-r border-gray-300 outline-none cursor-pointer">
+                        <option>All</option>
+                        <option>Filters</option>
+                        <option>Rubber</option>
+                    </select>
+                    <input type="text" id="b2c-search-input" placeholder="Search for premium auto parts..." class="w-full bg-transparent px-4 py-2 text-sm outline-none text-gray-800">
+                    <button class="bg-b2c-accent hover:bg-b2c-hover text-white px-5 py-2 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 shrink-0">
+                    <!-- Cart Button -->
+                    <button id="cart-toggle-btn" class="relative text-gray-800 hover:text-b2c-accent transition-colors p-2 flex items-center gap-2 font-bold">
+                        <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                        <div class="hidden sm:flex flex-col text-left leading-none">
+                            <span class="text-[10px] text-gray-500 font-normal">Cart</span>
+                            <span id="cart-subtotal-nav" class="text-sm font-black">₹0.00</span>
+                        </div>
+                        <span id="cart-count-badge" class="absolute top-0 right-0 sm:-top-1 sm:right-6 bg-b2c-accent text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black border-2 border-white shadow-sm">0</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Search -->
+            <div class="sm:hidden px-4 pb-3 border-t border-gray-200 mt-2 pt-2 bg-white">
+                <div class="flex items-center bg-gray-100 rounded-md overflow-hidden border border-gray-300">
+                    <input type="text" id="b2c-search-input-mobile" placeholder="Search parts..." class="w-full bg-transparent px-3 py-2 text-sm outline-none">
+                    <button class="bg-b2c-accent text-white px-4 py-2"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Cart Overlay & Sidebar -->
+        <div id="cart-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 overlay-closed transition-opacity duration-300"></div>
+        
+        <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-[60] cart-closed transition-transform duration-300 flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-cart-shopping text-b2c-accent"></i> Your Cart
+                </h2>
+                <button id="close-cart-btn" class="text-gray-400 hover:text-gray-800 transition-colors text-xl p-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <div id="empty-cart-msg" class="text-center text-gray-500 mt-10">
+                    <i class="fa-solid fa-box-open text-4xl mb-3 text-gray-300"></i>
+                    <p>Your cart is empty.</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 p-6 bg-gray-50">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-600 font-medium">Subtotal</span>
+                    <span id="cart-subtotal" class="text-2xl font-black text-gray-900">₹0.00</span>
+                </div>
+                <button id="checkout-btn" class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-extrabold text-lg py-4 rounded shadow-lg shadow-b2c-accent/20 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Proceed to Checkout <i class="fa-solid fa-lock text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-grow pt-32 sm:pt-28 pb-20 bg-gray-50">
+            <!-- Retail Hero Banner -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+                <div class="bg-gray-900 rounded-2xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl" style="background-image: url('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/90 to-gray-900/40"></div>
+                    <div class="relative z-10 max-w-xl">
+                        <span class="bg-b2c-accent text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">Direct to Consumer</span>
+                        <h1 class="text-3xl sm:text-5xl font-black mb-4 leading-tight">OEM Quality Parts.<br>Delivered Fast.</h1>
+                        <p class="text-gray-300 mb-6">Skip the middleman. Buy factory-direct components at unbeatable retail prices.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-2xl font-black text-gray-900">Recommended For You</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="b2c-product-grid">
+                    
+                    <!-- B2C Product 1 -->
+                    <div class="b2c-product-card bg-white border border-gray-200 rounded-xl p-5 transition-all duration-300 hover:shadow-xl product-card-hover flex flex-col justify-between" data-name="Universal Footrest Assembly">
+                        <div>
+                            <div class="relative overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center h-48">
+                                <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">Save 30%</span>
+                                <i class="fa-solid fa-motorcycle text-6xl text-gray-300 absolute z-0"></i>
+                                <img src="footrest.jpg" onerror="this.style.display='none'" class="relative z-10 w-full h-full object-cover transition-transform duration-500">
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">Universal Footrest Assembly (Pair)</h4>
+                            <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
+                                <span class="text-blue-600 hover:underline cursor-pointer">128 ratings</span>
+                            </p>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="mb-3 border-t border-gray-100 pt-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500 line-through">MRP: ₹650.00</span>
+                                </div>
+                                <div class="text-2xl font-black text-gray-900">₹450.00</div>
+                                <div class="text-xs text-green-600 font-bold mt-1">In Stock</div>
+                            </div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <label class="text-sm text-gray-600 font-medium">Qty:</label>
+                                <div class="flex items-center border border-gray-300 rounded bg-gray-50 h-8">
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-l" onclick="changeDisplayQty('p1', -1)">-</button>
+                                    <input type="text" id="qty-p1" value="1" class="w-8 text-center text-sm font-bold bg-transparent outline-none pointer-events-none" readonly>
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-r" onclick="changeDisplayQty('p1', 1)">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-bold py-2.5 rounded-full transition-colors flex justify-center items-center gap-2" 
+                                    onclick="addToCart('p1', 'Universal Footrest Assembly', 450.00, 'footrest.jpg', document.getElementById('qty-p1').value)">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- B2C Product 2 -->
+                    <div class="b2c-product-card bg-white border border-gray-200 rounded-xl p-5 transition-all duration-300 hover:shadow-xl product-card-hover flex flex-col justify-between" data-name="Hub Coupling Rubbers">
+                        <div>
+                            <div class="relative overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center h-48">
+                                <i class="fa-solid fa-circle-notch text-6xl text-gray-300 absolute z-0"></i>
+                                <img src="coupling.jpg" onerror="this.style.display='none'" class="relative z-10 w-full h-full object-cover transition-transform duration-500">
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">High-Tensile Hub Coupling Rubbers</h4>
+                            <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <span class="text-blue-600 hover:underline cursor-pointer">84 ratings</span>
+                            </p>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="mb-3 border-t border-gray-100 pt-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500 line-through">MRP: ₹250.00</span>
+                                </div>
+                                <div class="text-2xl font-black text-gray-900">₹150.00</div>
+                                <div class="text-xs text-green-600 font-bold mt-1">In Stock</div>
+                            </div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <label class="text-sm text-gray-600 font-medium">Qty:</label>
+                                <div class="flex items-center border border-gray-300 rounded bg-gray-50 h-8">
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-l" onclick="changeDisplayQty('p2', -1)">-</button>
+                                    <input type="text" id="qty-p2" value="1" class="w-8 text-center text-sm font-bold bg-transparent outline-none pointer-events-none" readonly>
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-r" onclick="changeDisplayQty('p2', 1)">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-bold py-2.5 rounded-full transition-colors flex justify-center items-center gap-2"
+                                    onclick="addToCart('p2', 'Hub Coupling Rubbers', 150.00, 'coupling.jpg', document.getElementById('qty-p2').value)">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- B2C Product 3 -->
+                    <div class="b2c-product-card bg-white border border-gray-200 rounded-xl p-5 transition-all duration-300 hover:shadow-xl product-card-hover flex flex-col justify-between" data-name="Premium Engine Filter">
+                        <div>
+                            <div class="relative overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center h-48">
+                                <span class="absolute top-2 left-2 bg-b2c-dark text-white text-xs font-bold px-2 py-1 rounded z-10">Best Seller</span>
+                                <i class="fa-solid fa-filter text-6xl text-gray-300 absolute z-0"></i>
+                                <img src="filter.jpg" onerror="this.style.display='none'" class="relative z-10 w-full h-full object-cover transition-transform duration-500">
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">Premium Synthetic Engine Filter</h4>
+                            <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <span class="text-blue-600 hover:underline cursor-pointer">312 ratings</span>
+                            </p>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="mb-3 border-t border-gray-100 pt-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500 line-through">MRP: ₹350.00</span>
+                                </div>
+                                <div class="text-2xl font-black text-gray-900">₹250.00</div>
+                                <div class="text-xs text-green-600 font-bold mt-1">In Stock</div>
+                            </div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <label class="text-sm text-gray-600 font-medium">Qty:</label>
+                                <div class="flex items-center border border-gray-300 rounded bg-gray-50 h-8">
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-l" onclick="changeDisplayQty('p3', -1)">-</button>
+                                    <input type="text" id="qty-p3" value="1" class="w-8 text-center text-sm font-bold bg-transparent outline-none pointer-events-none" readonly>
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-r" onclick="changeDisplayQty('p3', 1)">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-bold py-2.5 rounded-full transition-colors flex justify-center items-center gap-2"
+                                    onclick="addToCart('p3', 'Premium Engine Filter', 250.00, 'filter.jpg', document.getElementById('qty-p3').value)">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- B2C Product 4 -->
+                    <div class="b2c-product-card bg-white border border-gray-200 rounded-xl p-5 transition-all duration-300 hover:shadow-xl product-card-hover flex flex-col justify-between" data-name="Performance O-Ring Kit">
+                        <div>
+                            <div class="relative overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center h-48">
+                                <i class="fa-solid fa-ring text-6xl text-gray-300 absolute z-0"></i>
+                                <img src="custom-parts.jpg" onerror="this.style.display='none'" class="relative z-10 w-full h-full object-cover transition-transform duration-500">
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">Performance O-Ring & Seal Kit</h4>
+                            <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+                                <i class="fa-regular fa-star text-yellow-400"></i>
+                                <span class="text-blue-600 hover:underline cursor-pointer">45 ratings</span>
+                            </p>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="mb-3 border-t border-gray-100 pt-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500 line-through">MRP: ₹150.00</span>
+                                </div>
+                                <div class="text-2xl font-black text-gray-900">₹100.00</div>
+                                <div class="text-xs text-green-600 font-bold mt-1">In Stock</div>
+                            </div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <label class="text-sm text-gray-600 font-medium">Qty:</label>
+                                <div class="flex items-center border border-gray-300 rounded bg-gray-50 h-8">
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-l" onclick="changeDisplayQty('p4', -1)">-</button>
+                                    <input type="text" id="qty-p4" value="1" class="w-8 text-center text-sm font-bold bg-transparent outline-none pointer-events-none" readonly>
+                                    <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-r" onclick="changeDisplayQty('p4', 1)">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-bold py-2.5 rounded-full transition-colors flex justify-center items-center gap-2"
+                                    onclick="addToCart('p4', 'Performance O-Ring Kit', 100.00, 'custom-parts.jpg', document.getElementById('qty-p4').value)">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty Search Message -->
+                <div id="no-products-msg" class="hidden text-center py-20 text-gray-500">
+                    <i class="fa-solid fa-magnifying-glass text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg">No products found matching your search.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-gray-800 text-white pt-12 pb-8 mt-auto">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-sm text-gray-400">&copy; 2026 AKGE Store (Ankit Automotives). Consumer Retail Division.</p>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- B2B VIEW (WHOLESALE EXPORTER)              -->
+    <!-- ========================================== -->
+    <div id="view-b2b" style="display: none;" class="min-h-screen selection:bg-b2b-accent selection:text-white">
+        
+        <header class="fixed w-full top-0 z-40 glass-panel shadow-sm border-b border-gray-200">
+            <!-- Top Strip -->
+            <div class="bg-gray-900 text-white text-xs py-1.5 px-2 sm:px-4 text-center font-bold tracking-wide flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 relative">
+                <button onclick="window.showGate()" class="sm:absolute left-4 top-1/2 sm:-translate-y-1/2 flex items-center gap-1 text-gray-400 hover:text-white transition-colors mb-1 sm:mb-0">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Change Role</span>
+                </button>
+                <span>GLOBAL OEM MANUFACTURER</span>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative">
+                <div class="flex items-center gap-3">
+                    <div class="px-3 h-12 bg-gradient-to-br from-b2b-accent to-blue-700 rounded flex items-center justify-center shadow-md">
+                        <span class="text-white font-black text-2xl tracking-tighter">AKGE</span>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-xl font-extrabold text-gray-900 leading-tight tracking-wide">AKGE <span class="font-light text-gray-500 text-sm">by Ankit Automotives</span></h1>
+                        <p class="text-[10px] text-b2b-accent font-bold uppercase tracking-widest">Global OEM Manufacturer</p>
+                    </div>
+                </div>
+
+                <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-600">
+                    <a href="#b2b-home" class="hover:text-b2b-accent transition-colors">Home</a>
+                    <a href="#b2b-products" class="hover:text-b2b-accent transition-colors">Product Lines</a>
+                    <a href="#b2b-global-reach" class="hover:text-b2b-accent transition-colors">Global Export</a>
+                </nav>
+
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="#b2b-inquiry" class="bg-b2b-accent hover:bg-b2b-hover text-white font-extrabold text-sm px-6 py-2.5 rounded shadow-md transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice"></i> Request Quote
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="b2b-mobile-menu-btn" class="md:hidden text-gray-900 text-2xl focus:outline-none p-2">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Dropdown -->
+            <div id="b2b-mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-4 pt-2 pb-4 space-y-2 shadow-lg absolute w-full left-0 top-full">
+                <a href="#b2b-home" class="block py-2 text-gray-700 hover:text-b2b-accent font-medium">Home</a>
+                <a href="#b2b-products" class="block py-2 text-gray-700 hover:text-b2b-accent font-medium">Product Lines</a>
+                <a href="#b2b-global-reach" class="block py-2 text-gray-700 hover:text-b2b-accent font-medium">Global Export</a>
+                <a href="#b2b-inquiry" class="block py-2 text-b2b-accent font-bold">Request Quote</a>
+            </div>
+        </header>
+
+        <section id="b2b-home" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-white">
+            <div class="absolute inset-0 opacity-40" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 30px 30px;"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-50 border border-sky-200 text-gray-700 text-xs sm:text-sm font-semibold uppercase tracking-widest mb-8 shadow-sm">
+                    <i class="fa-solid fa-globe text-b2b-accent"></i> Worldwide B2B Exporter
+                </div>
+                
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-gray-900 leading-tight mb-6 tracking-tight">
+                    Global Manufacturing of <br class="hidden sm:block">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-b2b-accent to-blue-600">Premium Rubber Parts & Filters</span>
+                </h2>
+                
+                <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-10 font-light leading-relaxed">
+                    <strong class="text-gray-900 font-semibold">Ankit Automotives</strong> engineers high-performance multi-brand motorcycle and automotive components. From precision footrest assemblies to advanced filtration systems, <strong class="text-gray-900">AKGE</strong> is the trusted OEM partner worldwide.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#b2b-inquiry" class="bg-b2b-accent hover:bg-b2b-hover text-white font-bold text-base px-8 py-4 rounded shadow-lg shadow-b2b-accent/30 transition-all flex justify-center items-center gap-2">
+                        Partner With Us <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="b2b-products" class="py-24 bg-gray-50 border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-b2b-accent font-bold tracking-widest uppercase text-sm mb-2">Our Manufacturing Catalog</h2>
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Precision Automotive Components</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- B2B Product Card 1 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 transition-all hover:shadow-xl hover:border-b2b-accent group overflow-hidden text-center">
+                        <i class="fa-solid fa-motorcycle text-4xl text-gray-300 mb-4 block"></i>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-b2b-accent">Footrest Assemblies</h4>
+                        <p class="text-sm text-gray-600">Heavy-duty rubber and steel footrest setups for maximum grip.</p>
+                        <a href="#b2b-inquiry" class="mt-4 inline-block text-b2b-accent text-sm font-bold hover:underline">Inquire Bulk Rate</a>
+                    </div>
+                    <!-- B2B Product Card 2 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 transition-all hover:shadow-xl hover:border-b2b-accent group overflow-hidden text-center">
+                        <i class="fa-solid fa-circle-notch text-4xl text-gray-300 mb-4 block"></i>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-b2b-accent">Coupling Rubbers</h4>
+                        <p class="text-sm text-gray-600">High-tensile hub coupling rubbers ensuring smooth transmission.</p>
+                        <a href="#b2b-inquiry" class="mt-4 inline-block text-b2b-accent text-sm font-bold hover:underline">Inquire Bulk Rate</a>
+                    </div>
+                    <!-- B2B Product Card 3 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 transition-all hover:shadow-xl hover:border-b2b-accent group overflow-hidden text-center">
+                        <i class="fa-solid fa-filter text-4xl text-gray-300 mb-4 block"></i>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-b2b-accent">Air & Oil Filters</h4>
+                        <p class="text-sm text-gray-600">Advanced filtration media providing superior engine protection.</p>
+                        <a href="#b2b-inquiry" class="mt-4 inline-block text-b2b-accent text-sm font-bold hover:underline">Inquire Bulk Rate</a>
+                    </div>
+                    <!-- B2B Product Card 4 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 transition-all hover:shadow-xl hover:border-b2b-accent group overflow-hidden text-center">
+                        <i class="fa-solid fa-ring text-4xl text-gray-300 mb-4 block"></i>
+                        <h4 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-b2b-accent">Custom Molded Parts</h4>
+                        <p class="text-sm text-gray-600">O-rings, gaskets, dust seals for OEM specifications.</p>
+                        <a href="#b2b-inquiry" class="mt-4 inline-block text-b2b-accent text-sm font-bold hover:underline">Inquire Bulk Rate</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="b2b-inquiry" class="py-24 bg-white border-t border-gray-200 relative">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-2xl shadow-xl overflow-hidden p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                            <i class="fa-solid fa-briefcase text-b2b-accent"></i> B2B Bulk Order Inquiry
+                        </h2>
+                        <p class="text-gray-600">Contact our export division for container pricing and custom manufacturing.</p>
+                    </div>
+                    
+                    <form class="space-y-6" onsubmit="event.preventDefault(); showB2BToast();">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Full Name *</label>
+                                <input type="text" required class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Company Name *</label>
+                                <input type="text" required class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent" placeholder="AutoParts Inc.">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address *</label>
+                                <input type="email" required class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent" placeholder="om.ankitautomotives@gmail.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Phone Number *</label>
+                                <input type="text" required class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent" placeholder="+91 12345 67890">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Country / Region *</label>
+                                <input type="text" required class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent" placeholder="e.g. United Arab Emirates">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Primary Interest *</label>
+                                <select required class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent">
+                                    <option value="" disabled selected>Select Category...</option>
+                                    <option value="Footrest Assemblies">Footrest Assemblies</option>
+                                    <option value="Coupling Rubbers">Coupling Rubbers</option>
+                                    <option value="Air & Oil Filters">Air & Oil Filters</option>
+                                    <option value="Custom Molding">Custom Molding</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Message / Specifications</label>
+                            <textarea rows="4" class="w-full bg-white border border-gray-300 rounded p-3 focus:outline-none focus:border-b2b-accent focus:ring-1 focus:ring-b2b-accent" placeholder="Specify parts and estimated volume..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-b2b-accent text-white font-bold py-4 rounded shadow-lg hover:bg-b2b-hover transition-colors text-lg flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Inquiry to Export Team
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-100 border-t border-gray-200 pt-12 pb-8">
+            <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+                <p>&copy; 2026 Ankit Automotives (Brand: AKGE). Global Wholesale Division.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CHECKOUT VIEW                              -->
+    <!-- ========================================== -->
+    <div id="view-checkout" style="display: none;" class="min-h-screen bg-gray-50 flex flex-col selection:bg-b2c-accent selection:text-white">
+        
+        <!-- Checkout Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 py-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-b2c-dark to-slate-800 rounded flex items-center justify-center shadow-md">
+                        <span class="text-white font-black text-2xl tracking-tighter">AKGE</span>
+                    </div>
+                    <span class="font-bold text-xl text-gray-800 hidden sm:block">Secure Checkout</span>
+                </div>
+                <button onclick="window.returnToStore()" class="text-gray-500 hover:text-b2c-accent font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Back to Cart</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Shipping & Billing Form -->
+                <div class="flex-1 space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">1. Shipping Address</h2>
+                        <form id="checkout-form" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">First Name</label>
+                                    <input type="text" required class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Last Name</label>
+                                    <input type="text" required class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Street Address</label>
+                                <input type="text" required class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50" placeholder="123 Main St">
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                <div class="col-span-2 sm:col-span-1">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">City</label>
+                                    <input type="text" required class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">State</label>
+                                    <input type="text" required class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Zip Code</label>
+                                    <input type="text" required class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">2. Payment Method</h2>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 p-3 border border-b2c-accent bg-orange-50/50 rounded cursor-pointer">
+                                <input type="radio" name="payment" checked class="text-b2c-accent w-4 h-4">
+                                <span class="font-medium text-gray-800">Credit / Debit Card</span>
+                                <div class="ml-auto flex gap-1">
+                                    <i class="fa-brands fa-cc-visa text-xl text-blue-700"></i>
+                                    <i class="fa-brands fa-cc-mastercard text-xl text-red-500"></i>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded cursor-pointer opacity-60">
+                                <input type="radio" name="payment" disabled class="w-4 h-4">
+                                <span class="font-medium text-gray-800">PayPal (Coming Soon)</span>
+                            </label>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Card Number</label>
+                                <input type="text" placeholder="XXXX XXXX XXXX XXXX" class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">CVV</label>
+                                <input type="text" placeholder="123" class="w-full border border-gray-300 rounded p-2.5 outline-none focus:border-b2c-accent focus:ring-1 focus:ring-b2c-accent bg-gray-50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="w-full lg:w-96">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-lg sticky top-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4 pb-4 border-b border-gray-200">Order Summary</h2>
+                        
+                        <!-- Dynamic Checkout Items -->
+                        <div id="checkout-items-list" class="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
+                            <!-- Items populated by JS -->
+                        </div>
+
+                        <div class="space-y-3 border-t border-gray-200 pt-4 mb-6">
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Subtotal</span>
+                                <span id="checkout-subtotal" class="font-medium text-gray-900">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Shipping</span>
+                                <span id="checkout-shipping" class="font-medium text-gray-900">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Tax (Estimated)</span>
+                                <span id="checkout-tax" class="font-medium text-gray-900">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-black text-gray-900 border-t border-gray-200 pt-3 mt-3">
+                                <span>Total</span>
+                                <span id="checkout-total">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <button onclick="placeOrder()" class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-extrabold text-lg py-4 rounded shadow-lg shadow-b2c-accent/20 transition-all flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-lock text-sm"></i> Place Order Now
+                        </button>
+                        <p class="text-center text-xs text-gray-500 mt-4">By placing your order, you agree to our Terms of Service.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="bg-gray-800 text-white py-6 mt-auto">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-sm text-gray-400">&copy; 2026 AKGE Store (Ankit Automotives).</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- B2C Cart Toast -->
+    <div id="toast-b2c" class="fixed bottom-5 right-5 max-w-sm bg-green-600 text-white px-6 py-4 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[70] flex items-center gap-3 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <div id="toast-message-b2c" class="font-bold text-sm">Item added to cart!</div>
+    </div>
+
+    <!-- B2B Inquiry Toast -->
+    <div id="toast-b2b" class="fixed bottom-5 right-5 max-w-sm bg-sky-600 text-white px-6 py-4 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-[70] flex items-center gap-3 pointer-events-none">
+        <i class="fa-solid fa-envelope-circle-check text-xl"></i>
+        <div class="font-bold text-sm">Inquiry sent to Export Team.</div>
+    </div>
+    
+    <!-- Order Success Toast -->
+    <div id="toast-order" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-8 py-6 rounded-2xl shadow-2xl scale-95 opacity-0 transition-all duration-300 z-[100] flex flex-col items-center pointer-events-none text-center border-t-4 border-green-500 hidden">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-500 text-3xl">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <h3 class="text-2xl font-black text-gray-900 mb-2">Order Confirmed!</h3>
+        <p class="text-gray-600 mb-6">Thank you for shopping with AKGE Retail.</p>
+        <button onclick="closeOrderSuccess()" class="bg-gray-900 text-white px-6 py-2 rounded-full font-bold hover:bg-gray-800 transition-colors pointer-events-auto">Continue Shopping</button>
+    </div>
+
+    <script>
+        // --- Safe Storage Wrapper (Prevents iframe SecurityErrors) ---
+        const safeStorage = {
+            get: function(key) {
+                try { return localStorage.getItem(key); } 
+                catch(e) { return null; }
+            },
+            set: function(key, value) {
+                try { localStorage.setItem(key, value); } 
+                catch(e) { console.warn("Storage restricted in this environment."); }
+            }
+        };
+
+        // --- DOM Elements ---
+        let roleGate, viewB2C, viewB2B, viewCheckout;
+        let searchInputDesk, searchInputMob, b2cGrid, b2cCards, noMsg;
+        let cartToggleBtn, closeCartBtn, cartOverlay, cartSidebar, cartItemsContainer, emptyCartMsg, cartSubtotalEl, cartSubtotalNav, cartCountBadge, checkoutBtn;
+
+        // --- Filter Product Injection ---
+        const newFiltersList = [
+            // HERO
+            { id: 'LEB-001', brand: 'Hero', model: 'PLEASURE/MESTRO EDGE', rate: 99 },
+            { id: 'LEB-002', brand: 'Hero', model: 'PASSION X-PRO', rate: 105 },
+            { id: 'LEB-003', brand: 'Hero', model: 'KARIZMA', rate: 264 },
+            { id: 'LEB-004', brand: 'Hero', model: 'HUNK/CBZ-EXTREME/AMBITION', rate: 110 },
+            { id: 'LEB-007', brand: 'Hero', model: 'SUPER SPLENDOR/GLAMOUR', rate: 110 },
+            { id: 'LEB-010', brand: 'Hero', model: 'DESTINY/MAESTRO EDGE BS-6', rate: 176 },
+            { id: 'LEB-013', brand: 'Hero', model: 'X-PULSE', rate: 286 },
+            // HONDA
+            { id: 'LEB-051', brand: 'Honda', model: 'AVAITOR', rate: 176 },
+            { id: 'LEB-052', brand: 'Honda', model: 'ACTIVA-125CC', rate: 193 },
+            { id: 'LEB-054', brand: 'Honda', model: 'SHINE OLD MODEL', rate: 99 },
+            { id: 'LEB-056', brand: 'Honda', model: 'UNICORN NEW/DAZZLER', rate: 105 },
+            { id: 'LEB-065', brand: 'Honda', model: 'ACTIVA 6G', rate: 176 },
+            { id: 'LEB-068', brand: 'Honda', model: 'GRAZIA BS-6 (WITH FOAM)', rate: 231 },
+            { id: 'LEB-071', brand: 'Honda', model: 'SHINE 100 BS6', rate: 154 },
+            // YAMAHA
+            { id: 'LEB-101', brand: 'Yamaha', model: 'FZ', rate: 176 },
+            { id: 'LEB-105', brand: 'Yamaha', model: 'R-15', rate: 168 },
+            { id: 'LEB-109', brand: 'Yamaha', model: 'R-15 V3 BS-6', rate: 209 },
+            { id: 'LEB-112', brand: 'Yamaha', model: 'AEROH', rate: 330 },
+            // BAJAJ
+            { id: 'LEB-151', brand: 'Bajaj', model: 'VIKRANT', rate: 154 },
+            { id: 'LEB-152', brand: 'Bajaj', model: 'PULSAR 200NS', rate: 215 },
+            { id: 'LEB-156', brand: 'Bajaj', model: 'PULSAR-N 160/P-150', rate: 198 },
+            // SUZUKI
+            { id: 'LEB-201', brand: 'Suzuki', model: 'ACCESS OLD', rate: 153 },
+            { id: 'LEB-204', brand: 'Suzuki', model: 'GIXER', rate: 178 },
+            { id: 'LEB-207', brand: 'Suzuki', model: 'INTRUDER', rate: 286 },
+            // TVS
+            { id: 'LEB-251', brand: 'TVS', model: 'STAR CITY 110 WITH CLAMP', rate: 194 },
+            { id: 'LEB-253', brand: 'TVS', model: 'JUPITOR', rate: 161 },
+            { id: 'LEB-259', brand: 'TVS', model: 'NTORQ', rate: 220 },
+            { id: 'LEB-266', brand: 'TVS', model: 'JUPITER 125 BS-6/RIDER', rate: 220 },
+            // ROYAL ENFIELD & KTM
+            { id: 'LEB-301', brand: 'Royal Enfield', model: 'BULLET-500/THUNDER BIRD', rate: 187 },
+            { id: 'LEB-302', brand: 'Royal Enfield', model: 'BULLET 350 BIG', rate: 193 },
+            { id: 'LEB-451', brand: 'KTM', model: 'DUKE 250/390', rate: 231 },
+            // OIL FILTERS
+            { id: 'LEB-501', brand: 'Oil Filter', model: 'FZ', rate: 38 },
+            { id: 'LEB-504', brand: 'Oil Filter', model: 'BULLET N/M', rate: 46 },
+            { id: 'LEB-507', brand: 'Oil Filter', model: 'PULSAR-200 NS', rate: 55 },
+            { id: 'LEB-513', brand: 'Oil Filter', model: 'ACTIVA 6G', rate: 77 },
+            // FOAM FILTERS (INDIAN RATE)
+            { id: 'LEB-551', brand: 'Hero', model: 'CD DAWN/CD-100SS / CD DLX (DOUBLE)', rate: 72, type: 'Foam Filter' },
+            { id: 'LEB-552', brand: 'Hero', model: 'STREET', rate: 66, type: 'Foam Filter' },
+            { id: 'LEB-553', brand: 'Hero', model: 'SPLENDOR (DOUBLE) / PASSION', rate: 92, type: 'Foam Filter' },
+            { id: 'LEB-554', brand: 'Hero', model: 'CBZ/AMBITION', rate: 110, type: 'Foam Filter' },
+            { id: 'LEB-601', brand: 'Bajaj', model: 'PULSAR O/M', rate: 84, type: 'Foam Filter' },
+            { id: 'LEB-602', brand: 'Bajaj', model: 'PULSAR 220', rate: 88, type: 'Foam Filter' },
+            { id: 'LEB-604', brand: 'Bajaj', model: 'PLATINA/WIND-125', rate: 77, type: 'Foam Filter' },
+            { id: 'LEB-608', brand: 'Bajaj', model: 'KB-4S/BOXER/CALIBER/CT-100', rate: 92, type: 'Foam Filter' },
+            { id: 'LEB-611', brand: 'Bajaj', model: 'DISCOVER-100', rate: 94, type: 'Foam Filter' },
+            { id: 'LEB-614', brand: 'Bajaj', model: 'PLATINA BS-6', rate: 94, type: 'Foam Filter' },
+            { id: 'LEB-651', brand: 'Honda', model: 'ETERNO (DOUBLE)', rate: 121, type: 'Foam Filter' },
+            { id: 'LEB-652', brand: 'Honda', model: 'ACTIVA (SMALL)', rate: 22, type: 'Foam Filter' },
+            { id: 'LEB-653', brand: 'Honda', model: 'ACTIVA (DOUBLE)', rate: 77, type: 'Foam Filter' },
+            { id: 'LEB-701', brand: 'TVS', model: 'APACHE/FERIO / FREEDOM', rate: 105, type: 'Foam Filter' },
+            { id: 'LEB-704', brand: 'TVS', model: 'SCOOTY E/S/OLD', rate: 69, type: 'Foam Filter' },
+            { id: 'LEB-705', brand: 'TVS', model: 'WEGO', rate: 110, type: 'Foam Filter' },
+            { id: 'LEB-706', brand: 'TVS', model: 'VICTOR', rate: 77, type: 'Foam Filter' },
+            { id: 'LEB-710', brand: 'TVS', model: 'TVS KING', rate: 165, type: 'Foam Filter' },
+            { id: 'LEB-751', brand: 'Yamaha', model: 'RX-100 (DOUBLE)', rate: 77, type: 'Foam Filter' },
+            { id: 'LEB-752', brand: 'Yamaha', model: 'YBX (DOUBLE)/CRUX', rate: 88, type: 'Foam Filter' },
+            { id: 'LEB-771', brand: 'Mahindra', model: 'RADIO/DURO/FLIGHT', rate: 85, type: 'Foam Filter' }
+        ];
+
+        function injectFiltersToGrid() {
+            const grid = document.getElementById('b2c-product-grid');
+            if(!grid) return;
+
+            newFiltersList.forEach(prod => {
+                const sellingPrice = prod.rate;
+                // Calculate MRP as 30% higher than the rate in the image
+                const mrp = Math.ceil(sellingPrice * 1.30); 
+                const productType = prod.type || 'Filter';
+                const fullName = `${prod.brand} - ${prod.model} ${productType}`;
+                
+                // Smart Image Loading: Looks for LEB-001.jpg, falls back to placeholder if not found
+                const imgSrc = `${prod.id}.jpg`;
+                const fallbackUrl = `https://placehold.co/400x300/f8fafc/64748b?text=${prod.id}`;
+
+                const card = document.createElement('div');
+                card.className = 'b2c-product-card bg-white border border-gray-200 rounded-xl p-5 transition-all duration-300 hover:shadow-xl product-card-hover flex flex-col justify-between';
+                card.setAttribute('data-name', fullName);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="relative overflow-hidden rounded-lg mb-4 bg-gray-100 flex items-center justify-center h-48 border border-gray-100 shadow-inner">
+                            <span class="absolute top-2 left-2 bg-b2c-dark text-white text-xs font-bold px-2 py-1 rounded z-20 shadow-sm">${prod.brand}</span>
+                            <span class="absolute bottom-2 right-2 bg-gray-800/80 text-white text-[10px] font-bold px-2 py-1 rounded z-20">${prod.id}</span>
+                            <i class="fa-solid fa-filter text-6xl text-gray-200 absolute z-0"></i>
+                            <img src="${imgSrc}" onerror="this.onerror=null; this.src='${fallbackUrl}';" class="relative z-10 w-full h-full object-cover transition-transform duration-500">
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">${fullName}</h4>
+                        <p class="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <span class="text-blue-600 hover:underline cursor-pointer">Verified Fit</span>
+                        </p>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="mb-3 border-t border-gray-100 pt-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-500 line-through">MRP: ₹${mrp.toFixed(2)}</span>
+                                <span class="text-xs font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">-30%</span>
+                            </div>
+                            <div class="text-2xl font-black text-gray-900">₹${sellingPrice.toFixed(2)}</div>
+                            <div class="text-xs text-green-600 font-bold mt-1">In Stock</div>
+                        </div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <label class="text-sm text-gray-600 font-medium">Qty:</label>
+                            <div class="flex items-center border border-gray-300 rounded bg-gray-50 h-8">
+                                <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-l" onclick="window.changeDisplayQty('${prod.id}', -1)">-</button>
+                                <input type="text" id="qty-${prod.id}" value="1" class="w-8 text-center text-sm font-bold bg-transparent outline-none pointer-events-none" readonly>
+                                <button class="px-3 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors h-full rounded-r" onclick="window.changeDisplayQty('${prod.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <button class="w-full bg-b2c-accent hover:bg-b2c-hover text-white font-bold py-2.5 rounded-full transition-colors flex justify-center items-center gap-2"
+                                onclick="window.addToCart('${prod.id}', '${fullName}', ${sellingPrice}, '${imgSrc}', document.getElementById('qty-${prod.id}').value)">
+                            <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- App Initialization ---
+        function initApp() {
+            // Get views
+            roleGate = document.getElementById('role-gate');
+            viewB2C = document.getElementById('view-b2c');
+            viewB2B = document.getElementById('view-b2b');
+            viewCheckout = document.getElementById('view-checkout');
+
+            // Set up search
+            searchInputDesk = document.getElementById('b2c-search-input');
+            searchInputMob = document.getElementById('b2c-search-input-mobile');
+            b2cGrid = document.getElementById('b2c-product-grid');
+            b2cCards = document.querySelectorAll('.b2c-product-card');
+            noMsg = document.getElementById('no-products-msg');
+
+            if(searchInputDesk) searchInputDesk.addEventListener('input', handleSearch);
+            if(searchInputMob) searchInputMob.addEventListener('input', handleSearch);
+
+            // Setup cart elements
+            cartToggleBtn = document.getElementById('cart-toggle-btn');
+            closeCartBtn = document.getElementById('close-cart-btn');
+            cartOverlay = document.getElementById('cart-overlay');
+            cartSidebar = document.getElementById('cart-sidebar');
+            cartItemsContainer = document.getElementById('cart-items-container');
+            emptyCartMsg = document.getElementById('empty-cart-msg');
+            cartSubtotalEl = document.getElementById('cart-subtotal');
+            cartSubtotalNav = document.getElementById('cart-subtotal-nav');
+            cartCountBadge = document.getElementById('cart-count-badge');
+            checkoutBtn = document.getElementById('checkout-btn');
+
+            if(cartToggleBtn) cartToggleBtn.addEventListener('click', openCart);
+            if(closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
+            if(cartOverlay) cartOverlay.addEventListener('click', closeCart);
+            if(checkoutBtn) checkoutBtn.addEventListener('click', showCheckout);
+
+            // Inject the new filter products dynamically
+            injectFiltersToGrid();
+            
+            // Re-select all cards (including injected ones) so the Search Bar works for them
+            b2cCards = document.querySelectorAll('.b2c-product-card');
+
+            // Mobile menu setup for B2B
+            const b2bBtn = document.getElementById('b2b-mobile-menu-btn');
+            const b2bMenu = document.getElementById('b2b-mobile-menu');
+            
+            if (b2bBtn && b2bMenu) {
+                b2bBtn.addEventListener('click', () => {
+                    b2bMenu.classList.toggle('hidden');
+                });
+                b2bMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        b2bMenu.classList.add('hidden');
+                    });
+                });
+            }
+
+            // Show role gate cleanly
+            showGate();
+        }
+
+        // --- 1. Role Selection & Routing Logic ---
+        function showGate() {
+            if(viewB2C) viewB2C.style.display = 'none';
+            if(viewB2B) viewB2B.style.display = 'none';
+            if(viewCheckout) viewCheckout.style.display = 'none';
+            if(roleGate) {
+                roleGate.style.display = 'flex';
+                setTimeout(() => {
+                    roleGate.classList.remove('opacity-0', 'pointer-events-none');
+                }, 10);
+            }
+        }
+        window.showGate = showGate;
+
+        function selectRole(role) {
+            safeStorage.set('akge_role', role);
+            applyRole(role);
+        }
+        window.selectRole = selectRole;
+
+        function applyRole(role) {
+            if(roleGate) roleGate.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                if(roleGate) roleGate.style.display = 'none';
+                if(viewCheckout) viewCheckout.style.display = 'none';
+                if (role === 'b2c') {
+                    if(viewB2B) viewB2B.style.display = 'none';
+                    if(viewB2C) viewB2C.style.display = 'flex';
+                    renderCart(); // Initialize cart data for B2C
+                } else if (role === 'b2b') {
+                    if(viewB2C) viewB2C.style.display = 'none';
+                    if(viewB2B) viewB2B.style.display = 'block';
+                }
+                window.scrollTo(0,0);
+            }, 500); 
+        }
+
+        // --- 2. B2C Search Logic ---
+        function handleSearch(e) {
+            const term = e.target.value.toLowerCase();
+            let visibleCount = 0;
+            
+            // Sync inputs
+            if(e.target === searchInputDesk && searchInputMob) searchInputMob.value = term;
+            if(e.target === searchInputMob && searchInputDesk) searchInputDesk.value = term;
+
+            b2cCards.forEach(card => {
+                const title = card.getAttribute('data-name').toLowerCase();
+                if(title.includes(term)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                if(noMsg) noMsg.style.display = 'block';
+            } else {
+                if(noMsg) noMsg.style.display = 'none';
+            }
+        }
+
+        // --- 3. B2C Cart Logic ---
+        let cart = [];
+        try {
+            const savedCart = safeStorage.get('akge_b2c_cart');
+            if (savedCart) {
+                const parsed = JSON.parse(savedCart);
+                if (Array.isArray(parsed)) cart = parsed;
+            }
+        } catch (e) {
+            cart = [];
+        }
+
+        function openCart() {
+            cartSidebar.classList.remove('cart-closed');
+            cartSidebar.classList.add('cart-open');
+            cartOverlay.classList.remove('overlay-closed');
+            cartOverlay.classList.add('overlay-open');
+        }
+
+        function closeCart() {
+            cartSidebar.classList.remove('cart-open');
+            cartSidebar.classList.add('cart-closed');
+            cartOverlay.classList.remove('overlay-open');
+            cartOverlay.classList.add('overlay-closed');
+        }
+
+        function updateCart() {
+            safeStorage.set('akge_b2c_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function renderCart() {
+            let subtotal = 0;
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if(cartCountBadge) cartCountBadge.textContent = totalItems;
+            
+            if (cart.length === 0) {
+                if(emptyCartMsg) emptyCartMsg.style.display = 'block';
+                if(checkoutBtn) checkoutBtn.disabled = true;
+            } else {
+                if(emptyCartMsg) emptyCartMsg.style.display = 'none';
+                if(checkoutBtn) checkoutBtn.disabled = false;
+            }
+
+            if(cartItemsContainer) {
+                // Clear existing elements EXCEPT the empty message
+                Array.from(cartItemsContainer.children).forEach(child => {
+                    if (child.id !== 'empty-cart-msg') child.remove();
+                });
+
+                cart.forEach((item, index) => {
+                    subtotal += item.price * item.quantity;
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'flex gap-4 border-b border-gray-100 pb-4';
+                    
+                    let fallbackIcon = 'fa-box';
+                    if(item.id === 'p1') fallbackIcon = 'fa-motorcycle';
+                    if(item.id === 'p3') fallbackIcon = 'fa-filter';
+
+                    itemEl.innerHTML = `
+                        <div class="w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+                            <i class="fa-solid ${fallbackIcon} text-gray-300 absolute z-0 text-2xl"></i>
+                            <img src="${item.img}" onerror="this.style.display='none'" class="relative z-10 w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h5 class="text-sm font-bold text-gray-900 leading-tight line-clamp-2">${item.name}</h5>
+                            <div class="text-b2c-accent font-black text-sm mt-1">₹${item.price.toFixed(2)}</div>
+                            
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex items-center border border-gray-200 rounded">
+                                    <button class="px-2 py-0.5 text-gray-500 hover:bg-gray-100" onclick="updateQty(${index}, -1)">-</button>
+                                    <span class="px-2 text-xs font-bold w-6 text-center">${item.quantity}</span>
+                                    <button class="px-2 py-0.5 text-gray-500 hover:bg-gray-100" onclick="updateQty(${index}, 1)">+</button>
+                                </div>
+                                <button class="text-xs text-red-500 hover:underline font-semibold" onclick="removeItem(${index})">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                    cartItemsContainer.appendChild(itemEl);
+                });
+            }
+
+            const formattedSub = `₹${subtotal.toFixed(2)}`;
+            if(cartSubtotalEl) cartSubtotalEl.textContent = formattedSub;
+            if(cartSubtotalNav) cartSubtotalNav.textContent = formattedSub;
+        }
+
+        function addToCart(id, name, price, img, quantityStr) {
+            const quantity = parseInt(quantityStr) || 1;
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ id, name, price, img, quantity });
+            }
+
+            updateCart();
+            
+            const toast = document.getElementById('toast-b2c');
+            const toastMsg = document.getElementById('toast-message-b2c');
+            if(toast && toastMsg) {
+                toastMsg.textContent = `${quantity}x ${name} added to cart!`;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+        }
+        window.addToCart = addToCart;
+
+        function updateQty(index, change) {
+            if (cart[index].quantity + change > 0) {
+                cart[index].quantity += change;
+            } else {
+                cart.splice(index, 1);
+            }
+            updateCart();
+        }
+        window.updateQty = updateQty;
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+        window.removeItem = removeItem;
+
+        function changeDisplayQty(id, change) {
+            const input = document.getElementById(`qty-${id}`);
+            if (input) {
+                let val = parseInt(input.value) || 1;
+                val += change;
+                if (val < 1) val = 1; 
+                input.value = val;
+            }
+        }
+        window.changeDisplayQty = changeDisplayQty;
+
+        // --- 5. Checkout Logic ---
+        function showCheckout() {
+            if(cart.length === 0) return;
+            closeCart();
+            if(viewB2C) viewB2C.style.display = 'none';
+            if(viewCheckout) viewCheckout.style.display = 'flex';
+            window.scrollTo(0, 0);
+            renderCheckout();
+        }
+        window.showCheckout = showCheckout;
+
+        function returnToStore() {
+            if(viewCheckout) viewCheckout.style.display = 'none';
+            if(viewB2C) viewB2C.style.display = 'flex';
+            window.scrollTo(0, 0);
+            openCart();
+        }
+        window.returnToStore = returnToStore;
+
+        function renderCheckout() {
+            const list = document.getElementById('checkout-items-list');
+            if(!list) return;
+            
+            list.innerHTML = '';
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+                const itemTotal = item.price * item.quantity;
+                
+                let fallbackIcon = 'fa-box';
+                if(item.id === 'p1') fallbackIcon = 'fa-motorcycle';
+                if(item.id === 'p3') fallbackIcon = 'fa-filter';
+
+                list.innerHTML += `
+                    <div class="flex gap-3 items-center">
+                        <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center relative overflow-hidden">
+                            <i class="fa-solid ${fallbackIcon} text-gray-300 absolute z-0 text-xl"></i>
+                            <img src="${item.img}" onerror="this.style.display='none'" class="relative z-10 w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h5 class="text-xs font-bold text-gray-900 leading-tight line-clamp-1">${item.name}</h5>
+                            <div class="text-xs text-gray-500 mt-0.5">Qty: ${item.quantity} × ₹${item.price.toFixed(2)}</div>
+                        </div>
+                        <div class="font-black text-sm text-gray-900">₹${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            const shipping = subtotal > 999 ? 0 : 99;
+            const tax = subtotal * 0.18; // 18% GST
+            const total = subtotal + shipping + tax;
+
+            document.getElementById('checkout-subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('checkout-shipping').textContent = shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`;
+            document.getElementById('checkout-tax').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('checkout-total').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function placeOrder() {
+            const toast = document.getElementById('toast-order');
+            if(toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.remove('scale-95', 'opacity-0');
+                    toast.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+            
+            cart = [];
+            updateCart();
+        }
+        window.placeOrder = placeOrder;
+
+        function closeOrderSuccess() {
+            const toast = document.getElementById('toast-order');
+            if(toast) {
+                toast.classList.remove('scale-100', 'opacity-100');
+                toast.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                    if(viewCheckout) viewCheckout.style.display = 'none';
+                    if(viewB2C) viewB2C.style.display = 'flex';
+                    window.scrollTo(0, 0);
+                }, 300);
+            }
+        }
+        window.closeOrderSuccess = closeOrderSuccess;
+
+        // --- 6. B2B Form Logic ---
+        function showB2BToast() {
+            const toast = document.getElementById('toast-b2b');
+            if(toast) {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+            const form = document.querySelector('#b2b-inquiry form');
+            if(form) form.reset();
+        }
+        window.showB2BToast = showB2BToast;
+
+        // Launch app safely for sandbox iframes
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initApp, 1);
+        } else {
+            document.addEventListener('DOMContentLoaded', initApp);
+            window.addEventListener('load', initApp);
+        }
+
+    </script>
+</body>
+</html>
