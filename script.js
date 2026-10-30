@@ -96,7 +96,7 @@ function injectFiltersToGrid() {
         const fullName = `${prod.brand} - ${prod.model} ${productType}`;
         
         // Smart Image Loading: Looks for LEB-001.jpg, falls back to placeholder if not found
-        const imgSrc = `${prod.id.toLowerCase()}.png`;
+       const imgSrc = `${prod.id.toLowerCase()}.png`;
         const fallbackUrl = `https://placehold.co/400x300/f8fafc/64748b?text=${prod.id}`;
 
         const card = document.createElement('div');
